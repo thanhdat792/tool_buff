@@ -1,0 +1,13 @@
+﻿Tự tạo cho mình 1 profile firefox
+Cài đặt + addon hoàn tất
+Xong vào thư mục profile của ff, copy đoạn dưới gõ lên đường dẫn thư mục
+hoặc bấm Window + R rồi gõ vào
+%AppData%\Mozilla\Firefox\Profiles
+
+sau đó vào đúng cái tên thư mục profile mình đã tạo
+
+nén hết vào file rar. đặt tên Profile.rar, mở file Profile.rar mẫu trong tool để xem 
+cách nén, phải vào trong thư mục tên profile rồi bấm ctrl A rồi nén lại.
+
+
+copy file đó vào thư mục tool

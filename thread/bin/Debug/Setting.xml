@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Root>
+  <Setting>
+    <Proxy>False</Proxy>
+    <Anonymizer>False</Anonymizer>
+    <Blacklist>False</Blacklist>
+    <WhoerError>False</WhoerError>
+    <Duplicate>True</Duplicate>
+    <Fresh>True</Fresh>
+    <Unused>True</Unused>
+    <DeleteSSHdie>False</DeleteSSHdie>
+    <RandomSSH>False</RandomSSH>
+    <nmrSSHtimeout>9</nmrSSHtimeout>
+    <txtSSHlink></txtSSHlink>
+    <cbLinkSSH>False</cbLinkSSH>
+    <nmrThread>10</nmrThread>
+    <FFProfileScan>False</FFProfileScan>
+    <FFProfileThreadId>True</FFProfileThreadId>
+  </Setting>
+</Root>
