@@ -1,4 +1,6 @@
 ﻿using Microsoft.Win32;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Firefox;
 using Renci.SshNet;
 using Renci.SshNet.Common;
 using System;
@@ -49,6 +51,7 @@ namespace thread
         private const string subkey = "shkey";
         private const string keyName = "HKEY_CURRENT_USER\\shkey";
         private int numOfThread = 0;
+        private int[] processId;
         private Setting setting = new Setting();
         private ForwardedPortDynamic[] forwardPorts;
         private string[] freshLinkConfig;
@@ -622,46 +625,55 @@ namespace thread
         }
         private void Firefox(int threadId)
         {
+            
+
             if (Directory.Exists(string.Concat(this.ffpdir, threadId)))
             {
+                // process param
+                var cService = FirefoxDriverService.CreateDefaultService();
+                cService.HideCommandPromptWindow = true;
+                // profile param
+                var profileManager = new FirefoxProfileManager();
+                FirefoxProfile profile = profileManager.GetProfile(threadId.ToString());
+                // firefox driver options
+                var firefoxOptions = new FirefoxOptions();
+                firefoxOptions.AddArguments("disable-infobars");
+                firefoxOptions.Profile = profile;
+                // start firefox
                 try
                 {
-                    ProcessStartInfo processStartInfo = new ProcessStartInfo()
+                    IWebDriver Driver = new FirefoxDriver(cService,firefoxOptions);
+                    Driver.Navigate().GoToUrl("https://whoer.net");
+                    this.processId[threadId] = cService.ProcessId;
+                }
+                catch (Exception e) { Console.WriteLine(e); }
+                // process manage
+                Process process = Process.GetProcessById(this.processId[threadId]);
+                this.ffStopFlag[threadId] = false;
+                while (true)
+                {
+                    if (process.HasExited)
                     {
-                        FileName = this.ffdir,
-                        Arguments = string.Concat(new object[] { "-profile \"", this.ffpdir, threadId, "\" -no-remote" }),
-                        WindowStyle = ProcessWindowStyle.Maximized
-                    };
-                    Process process = Process.Start(processStartInfo);
-                    this.ffStopFlag[threadId] = false;
-                    while (true)
-                    {
-                        if (process.HasExited)
-                        {
-                            break;
-                        }
-                        else if ((!this.ffStopFlag[threadId] ? false : !process.HasExited))
-                        {
-                            process.CloseMainWindow();
-                            Thread.Sleep(3000);
-                            break;
-                        }
-                        else if (!this.ffStopFlag[threadId])
-                        {
-                            Thread.Sleep(2000);
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        break;
                     }
-                    if (!process.HasExited)
+                    else if ((!this.ffStopFlag[threadId] ? false : !process.HasExited))
                     {
-                        process.Kill();
+                        process.CloseMainWindow();
+                        Thread.Sleep(3000);
+                        break;
+                    }
+                    else if (!this.ffStopFlag[threadId])
+                    {
+                        Thread.Sleep(2000);
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
-                catch
+                if (!process.HasExited)
                 {
+                    process.Kill();
                 }
             }
             else
@@ -1422,6 +1434,7 @@ namespace thread
             this.forwardPorts = new ForwardedPortDynamic[num];
             this._isChangingSSH = new bool[num];
             this._isManualrunning = new bool[num];
+            this.processId = new int[num];
             for (int i = 0; i < num; i++)
             {
                 this.forwardPorts[i] = new ForwardedPortDynamic("127.0.0.1", Convert.ToUInt32(1080 + i));
